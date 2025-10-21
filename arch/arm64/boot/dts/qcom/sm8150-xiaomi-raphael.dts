@@ -544,7 +544,7 @@
 	
 	zap-shader {
 		memory-region = <&gpu_mem>;
-		firmware-name = "qcom/sm8150/Xiaomi/raphael/a640_zap.mbn";
+		firmware-name = "qcom/sm8150/xiaomi/raphael/a640_zap.mbn";
 	};
 };
 
@@ -567,7 +567,7 @@
 	status = "okay";
 	qcom,gsi-loader = "self";
 	memory-region = <&ipa_fw_mem>;
-	firmware-name = "qcom/sm8150/Xiaomi/raphael/ipa_fws.mbn";
+	firmware-name = "qcom/sm8150/xiaomi/raphael/ipa_fws.mbn";
 };
 
 &mdss_dsi0 {
@@ -757,22 +757,22 @@
 
 &remoteproc_adsp {
 	status = "okay";
-	firmware-name = "qcom/sm8150/Xiaomi/raphael/adsp.mbn";
+	firmware-name = "qcom/sm8150/xiaomi/raphael/adsp.mbn";
 };
 
 &remoteproc_cdsp {
 	status = "okay";
-	firmware-name = "qcom/sm8150/Xiaomi/raphael/cdsp.mbn";
+	firmware-name = "qcom/sm8150/xiaomi/raphael/cdsp.mbn";
 };
 
 &remoteproc_mpss {
 	status = "okay";
-	firmware-name = "qcom/sm8150/Xiaomi/raphael/modem.mbn";
+	firmware-name = "qcom/sm8150/xiaomi/raphael/modem.mbn";
 };
 
 &remoteproc_slpi {
 	status = "disabled";
-	firmware-name = "qcom/sm8150/Xiaomi/raphael/slpi.mbn";
+	firmware-name = "qcom/sm8150/xiaomi/raphael/slpi.mbn";
 };
 
 &tlmm {
