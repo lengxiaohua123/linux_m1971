@@ -618,12 +618,9 @@ static void nfs_local_call_read(struct work_struct *work)
 	struct nfs_local_kiocb *iocb =
 		container_of(work, struct nfs_local_kiocb, work);
 	struct file *filp = iocb->kiocb.ki_filp;
-	const struct cred *save_cred;
 	bool force_done = false;
 	ssize_t status;
 	int n_iters;
-
-	save_cred = override_creds(filp->f_cred);
 
 	n_iters = atomic_read(&iocb->n_iters);
 	for (int i = 0; i < n_iters ; i++) {
@@ -637,7 +634,9 @@ static void nfs_local_call_read(struct work_struct *work)
 		} else
 			iocb->kiocb.ki_flags &= ~IOCB_DIRECT;
 
-		status = filp->f_op->read_iter(&iocb->kiocb, &iocb->iters[i]);
+		scoped_with_creds(filp->f_cred)
+			status = filp->f_op->read_iter(&iocb->kiocb, &iocb->iters[i]);
+
 		if (status != -EIOCBQUEUED) {
 			if (unlikely(status >= 0 && status < iocb->iters[i].count))
 				force_done = true; /* Partial read */
@@ -647,8 +646,6 @@ static void nfs_local_call_read(struct work_struct *work)
 			}
 		}
 	}
-
-	revert_creds(save_cred);
 }
 
 static int
@@ -824,13 +821,11 @@ static void nfs_local_call_write(struct work_struct *work)
 		container_of(work, struct nfs_local_kiocb, work);
 	struct file *filp = iocb->kiocb.ki_filp;
 	unsigned long old_flags = current->flags;
-	const struct cred *save_cred;
 	bool force_done = false;
 	ssize_t status;
 	int n_iters;
 
 	current->flags |= PF_LOCAL_THROTTLE | PF_MEMALLOC_NOIO;
-	save_cred = override_creds(filp->f_cred);
 
 	file_start_write(filp);
 	n_iters = atomic_read(&iocb->n_iters);
@@ -845,7 +840,9 @@ static void nfs_local_call_write(struct work_struct *work)
 		} else
 			iocb->kiocb.ki_flags &= ~IOCB_DIRECT;
 
-		status = filp->f_op->write_iter(&iocb->kiocb, &iocb->iters[i]);
+		scoped_with_creds(filp->f_cred)
+			status = filp->f_op->write_iter(&iocb->kiocb, &iocb->iters[i]);
+
 		if (status != -EIOCBQUEUED) {
 			if (unlikely(status >= 0 && status < iocb->iters[i].count))
 				force_done = true; /* Partial write */
@@ -857,7 +854,6 @@ static void nfs_local_call_write(struct work_struct *work)
 	}
 	file_end_write(filp);
 
-	revert_creds(save_cred);
 	current->flags = old_flags;
 }
 

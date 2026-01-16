@@ -55,4 +55,3 @@ EFI_ZBOOT_OBJCOPY_FLAGS	= --add-symbol zboot_code_size=0x$$( \
 				$(NM) vmlinux|grep _kernel_codesize|cut -d' ' -f1)
 
 include $(srctree)/drivers/firmware/efi/libstub/Makefile.zboot
-
